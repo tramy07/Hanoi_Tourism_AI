@@ -26,6 +26,8 @@ def data_change(data):
         hours, minutes = map(int, time_str.split(":"))
         return hours * 60 + minutes
     for location in data.values():
-        location["open"] = time_to_minutes(location["open"])
-        location["close"] = time_to_minutes(location["close"])
+        if isinstance(location["open"], str):
+            location["open"] = time_to_minutes(location["open"])
+        if isinstance(location["close"], str):
+            location["close"] = time_to_minutes(location["close"])
     return 0
