@@ -1,0 +1,2 @@
+﻿datasets,greedy_optimal_rate,average_gap,max_gap,astar_differs_from_brute,gap_distribution
+300,0.35,0.8566666666666667,3,0,"{0: 105, 1: 139, 2: 50, 3: 6}"
