@@ -1,6 +1,7 @@
 
 # THUẬT TOÁN VÉT CẠN (DÙNG evaluate ĐỂ ĐÁNH GIÁ MỖI HOÁN VỊ)
 # =========================================================
+import itertools
 from common import try_visit, evaluate
 
 def brute_force_search(start_point, start_time, end_time, matrix, places):
