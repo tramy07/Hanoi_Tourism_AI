@@ -1,4 +1,4 @@
-def time_to_minutes(time_str):
+def small_time_to_minutes(time_str):
     hours, minutes = map(int, time_str.split(":"))
     return hours * 60 + minutes
 
