@@ -24,3 +24,12 @@ def evaluate(path, start_time, end_time, start_point, matrix, places):
         else:
             return num_of_visited_places, current_time
     return num_of_visited_places, current_time
+
+def data_change(data):
+    def time_to_minutes(time_str):
+        hours, minutes = map(int, time_str.split(":"))
+        return hours * 60 + minutes
+    for location in data.values():
+    location["open"] = time_to_minutes(location["open"])
+    location["close"] = time_to_minutes(location["close"])
+    return 0
