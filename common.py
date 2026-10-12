@@ -1,3 +1,7 @@
+def time_to_minutes(time_str):
+    hours, minutes = map(int, time_str.split(":"))
+    return hours * 60 + minutes
+
 def try_visit(current_time, end_time, current_location, next_location, matrix, places):
     arrive_time = current_time + matrix[current_location][next_location]
     total_spend_time = max(arrive_time, places[next_location]['open']) + places[next_location]['visit_time']
