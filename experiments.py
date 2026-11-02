@@ -1,10 +1,9 @@
-
 """Thuc nghiem so sanh Greedy, A* va vet can cho bai toan tham quan Ha Noi.
 
 Tat ca thoi gian deu tinh bang PHUT.
 
 Dinh nghia "so trang thai duyet" (cot states):
-- Greedy : so lan goi try_visit de kiem tra mot diem ung vien.
+- Greedy : tong so lan goi try_visit (loc ung vien va dem h).
 - A*     : so phuong an (trang thai) da duoc lay ra khoi hang doi va mo rong.
 - Vet can: so hoan vi da danh gia bang evaluate (7! = 5040).
 Chay file nay bang: python experiments.py
@@ -64,27 +63,11 @@ def format_time(minutes):
     return f"{minutes // 60:02d}:{minutes % 60:02d}"
 
 
-def greedy_state_count(path):
-    """Dem so lan Greedy kiem tra mot diem ung vien bang try_visit.
-
-    greedy.py khong tra ve bo dem, nen ta suy ra tu do dai lo trinh:
-    moi vong lap kiem tra tat ca diem chua tham; neu chua tham het thi co
-    them mot vong kiem tra cuoi khong tim duoc ung vien.
-    """
-    total_places = len(BASE_PLACES) - 1
-    visited = len(path)
-    checks = sum(total_places - i for i in range(visited))
-    if visited < total_places:
-        checks += total_places - visited
-    return checks
-
-
 def run_once(algorithm, start_time, end_time, matrix, places):
     """Chay mot lan va tra ve ket qua chuan hoa."""
     started = time.perf_counter()
     if algorithm == "Greedy":
-        path, count, finish = greedy_search(START_POINT, start_time, end_time, matrix, places)
-        states = greedy_state_count(path)
+        path, count, finish, states = greedy_search(START_POINT, start_time, end_time, matrix, places)
     elif algorithm == "A*":
         path, count, finish, states = astar_search(START_POINT, start_time, end_time, matrix, places)
     elif algorithm == "Vet can":
@@ -174,7 +157,7 @@ def save_csv(rows, filename):
 
 
 def run_fixed_scenarios(repeats=TIME_REPEATS):
-    """Chay TN1, TN2, TN3 va luu ket qua tung thuat toan vao CSV."""
+    """Chay TN1, TN2 va luu ket qua tung thuat toan vao CSV."""
     scenarios = []
 
     # TN1: 8 gio, tat ca dia diem tham quan mo 07:00-22:00.
@@ -188,13 +171,6 @@ def run_fixed_scenarios(repeats=TIME_REPEATS):
     # TN2: du lieu gio mo/dong cua goc, bat dau 08:00, gioi han 6 tieng.
     scenarios.append(("TN2", 8 * 60, 14 * 60, BASE_MATRIX, deepcopy(BASE_PLACES)))
 
-    # TN3: 3 gio xuat phat x 3 do dai hanh trinh.
-    for start_hour in (8 * 60, 9 * 60 + 30, 11 * 60):
-        for duration_hours in (4, 6, 8):
-            scenario_name = f"TN3_start_{format_time(start_hour).replace(':', '')}_{duration_hours}h"
-            scenarios.append((scenario_name, start_hour, start_hour + duration_hours * 60,
-                              BASE_MATRIX, deepcopy(BASE_PLACES)))
-
     rows = []
     for scenario_name, start_time, end_time, matrix, places in scenarios:
         for algorithm in ALGORITHMS:
@@ -206,7 +182,7 @@ def run_fixed_scenarios(repeats=TIME_REPEATS):
 
 
 def make_random_dataset(rng, base_matrix=BASE_MATRIX, base_places=BASE_PLACES):
-    """Tao mot bo du lieu ngau nhien theo TN4, ma tran van doi xung."""
+    """Tao mot bo du lieu ngau nhien theo TN3, ma tran van doi xung."""
     matrix = [[0 for _ in row] for row in base_matrix]
     for i in range(len(base_matrix)):
         for j in range(i + 1, len(base_matrix)):
@@ -234,10 +210,10 @@ def make_random_dataset(rng, base_matrix=BASE_MATRIX, base_places=BASE_PLACES):
 
 
 def run_random_scenarios(n=RANDOM_DATASETS, seed=RANDOM_SEED):
-    """TN4: chay 300 bo ngau nhien, xuat CSV va tra ve thong ke tong hop.
+    """TN3: chay 300 bo ngau nhien, xuat CSV va tra ve thong ke tong hop.
 
     Moi bo du lieu chay moi thuat toan mot lan de giu thoi gian thuc thi hop ly.
-    Thoi gian benchmark lap 100 lan duoc ghi rieng trong CSV TN1-TN3.
+    Thoi gian benchmark lap 100 lan duoc ghi rieng trong CSV TN1-TN2.
     """
     rng = random.Random(seed)
     rows = []
@@ -268,7 +244,7 @@ def run_random_scenarios(n=RANDOM_DATASETS, seed=RANDOM_SEED):
             "astar_matches_brute": astar_count == brute_count,
         })
 
-    save_csv(rows, "TN4_random_300_results.csv")
+    save_csv(rows, "TN3_random_300_results.csv")
     gaps = [row["gap_brute_minus_greedy"] for row in rows]
     summary = {
         "datasets": len(rows),
@@ -278,23 +254,23 @@ def run_random_scenarios(n=RANDOM_DATASETS, seed=RANDOM_SEED):
         "astar_differs_from_brute": sum(not row["astar_matches_brute"] for row in rows),
         "gap_distribution": {gap: gaps.count(gap) for gap in sorted(set(gaps))},
     }
-    save_csv([summary], "TN4_summary.csv")
+    save_csv([summary], "TN3_summary.csv")
     return rows, summary
 
 
 def run_all(repeats=TIME_REPEATS, n_random=RANDOM_DATASETS, seed=RANDOM_SEED):
-    """Chay toan bo TN1-TN4 va tra ve du lieu cho notebook."""
+    """Chay toan bo TN1-TN3 va tra ve du lieu cho notebook."""
     fixed_rows = run_fixed_scenarios(repeats=repeats)
     random_rows, random_summary = run_random_scenarios(n=n_random, seed=seed)
     return fixed_rows, random_rows, random_summary
 
 
 if __name__ == "__main__":
-    print("Dang chay TN1-TN3 (do thoi gian trung binh qua", TIME_REPEATS, "lan)...")
+    print("Dang chay TN1-TN2 (do thoi gian trung binh qua", TIME_REPEATS, "lan)...")
     fixed = run_fixed_scenarios(repeats=TIME_REPEATS)
     print("Da luu:", OUTPUT_DIR / "fixed_scenarios_results.csv")
-    print("Dang chay TN4 voi", RANDOM_DATASETS, "bo du lieu ngau nhien...")
+    print("Dang chay TN3 voi", RANDOM_DATASETS, "bo du lieu ngau nhien...")
     random_rows, summary = run_random_scenarios(n=RANDOM_DATASETS, seed=RANDOM_SEED)
-    print("Da luu:", OUTPUT_DIR / "TN4_random_300_results.csv")
-    print("Thong ke TN4:", summary)
+    print("Da luu:", OUTPUT_DIR / "TN3_random_300_results.csv")
+    print("Thong ke TN3:", summary)
     print("Luu y: neu astar_differs_from_brute > 0, can kiem tra lai A* va heuristic.")
