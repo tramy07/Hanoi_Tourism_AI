@@ -1,4 +1,4 @@
-"""Thuc nghiem so sanh Greedy, A* va vet can cho bai toan tham quan Ha Noi.
+"""Thuc nghiem TN1-TN2 so sanh Greedy, A* va vet can cho bai toan tham quan Ha Noi.
 
 Tat ca thoi gian deu tinh bang PHUT.
 
@@ -13,7 +13,6 @@ Hoac import cac ham trong notebook.ipynb.
 from copy import deepcopy
 from pathlib import Path
 import csv
-import random
 import time
 
 from common import try_visit
@@ -24,8 +23,6 @@ from brute import brute_force_search
 OUTPUT_DIR = Path(__file__).resolve().parent / "results"
 START_POINT = 0
 TIME_REPEATS = 100
-RANDOM_DATASETS = 300
-RANDOM_SEED = 42
 
 # Gio mo/dong cua va thoi gian tham quan deu tinh bang phut sau nua dem.
 # 0: Hoan Kiem Lake la diem xuat phat, khong tinh la diem tham quan.
@@ -160,12 +157,12 @@ def run_fixed_scenarios(repeats=TIME_REPEATS):
     """Chay TN1, TN2 va luu ket qua tung thuat toan vao CSV."""
     scenarios = []
 
-    # TN1: 8 gio, tat ca dia diem tham quan mo 07:00-22:00.
+    # TN1: 8 gio, tat ca dia diem tham quan mo ca ngay (00:00-24:00).
     tn1_places = deepcopy(BASE_PLACES)
     for place_id in tn1_places:
         if place_id != START_POINT:
-            tn1_places[place_id]["open"] = 7 * 60
-            tn1_places[place_id]["close"] = 22 * 60
+            tn1_places[place_id]["open"] = 0
+            tn1_places[place_id]["close"] = 24 * 60
     scenarios.append(("TN1", 8 * 60, 16 * 60, BASE_MATRIX, tn1_places))
 
     # TN2: du lieu gio mo/dong cua goc, bat dau 08:00, gioi han 6 tieng.
@@ -181,96 +178,12 @@ def run_fixed_scenarios(repeats=TIME_REPEATS):
     return rows
 
 
-def make_random_dataset(rng, base_matrix=BASE_MATRIX, base_places=BASE_PLACES):
-    """Tao mot bo du lieu ngau nhien theo TN3, ma tran van doi xung."""
-    matrix = [[0 for _ in row] for row in base_matrix]
-    for i in range(len(base_matrix)):
-        for j in range(i + 1, len(base_matrix)):
-            factor = rng.uniform(0.6, 1.4)
-            raw = base_matrix[i][j] * factor
-            # Lam tron den boi so 5 phut gan nhat; dam bao duong di khong am.
-            travel = max(0, int(5 * round(raw / 5)))
-            matrix[i][j] = travel
-            matrix[j][i] = travel
-
-    places = deepcopy(base_places)
-    open_options = (7 * 60, 8 * 60, 9 * 60)
-    close_options = (11 * 60, 12 * 60, 17 * 60, 22 * 60)
-    visit_options = (30, 60, 90)
-    for place_id in places:
-        if place_id == START_POINT:
-            continue
-        opening = rng.choice(open_options)
-        closing = rng.choice(close_options)
-        # Tat ca moc dong cua trong danh sach deu sau gio mo cua.
-        places[place_id]["open"] = opening
-        places[place_id]["close"] = closing
-        places[place_id]["visit_time"] = rng.choice(visit_options)
-    return matrix, places
-
-
-def run_random_scenarios(n=RANDOM_DATASETS, seed=RANDOM_SEED):
-    """TN3: chay 300 bo ngau nhien, xuat CSV va tra ve thong ke tong hop.
-
-    Moi bo du lieu chay moi thuat toan mot lan de giu thoi gian thuc thi hop ly.
-    Thoi gian benchmark lap 100 lan duoc ghi rieng trong CSV TN1-TN2.
-    """
-    rng = random.Random(seed)
-    rows = []
-    for dataset_id in range(1, n + 1):
-        matrix, places = make_random_dataset(rng)
-        results = {}
-        for algorithm in ALGORITHMS:
-            results[algorithm] = run_once(algorithm, 8 * 60, 14 * 60, matrix, places)
-
-        greedy_count = results["Greedy"]["num_visited"]
-        astar_count = results["A*"]["num_visited"]
-        brute_count = results["Vet can"]["num_visited"]
-        rows.append({
-            "dataset_id": dataset_id,
-            "greedy_count": greedy_count,
-            "astar_count": astar_count,
-            "brute_count": brute_count,
-            "greedy_finish": results["Greedy"]["finish_clock"],
-            "astar_finish": results["A*"]["finish_clock"],
-            "brute_finish": results["Vet can"]["finish_clock"],
-            "greedy_states": results["Greedy"]["states"],
-            "astar_states": results["A*"]["states"],
-            "brute_states": results["Vet can"]["states"],
-            "greedy_runtime_seconds": results["Greedy"]["runtime_seconds"],
-            "astar_runtime_seconds": results["A*"]["runtime_seconds"],
-            "brute_runtime_seconds": results["Vet can"]["runtime_seconds"],
-            "gap_brute_minus_greedy": brute_count - greedy_count,
-            "astar_matches_brute": astar_count == brute_count,
-        })
-
-    save_csv(rows, "TN3_random_300_results.csv")
-    gaps = [row["gap_brute_minus_greedy"] for row in rows]
-    summary = {
-        "datasets": len(rows),
-        "greedy_optimal_rate": sum(row["greedy_count"] == row["brute_count"] for row in rows) / len(rows) if rows else 0,
-        "average_gap": sum(gaps) / len(gaps) if gaps else 0,
-        "max_gap": max(gaps) if gaps else 0,
-        "astar_differs_from_brute": sum(not row["astar_matches_brute"] for row in rows),
-        "gap_distribution": {gap: gaps.count(gap) for gap in sorted(set(gaps))},
-    }
-    save_csv([summary], "TN3_summary.csv")
-    return rows, summary
-
-
-def run_all(repeats=TIME_REPEATS, n_random=RANDOM_DATASETS, seed=RANDOM_SEED):
-    """Chay toan bo TN1-TN3 va tra ve du lieu cho notebook."""
-    fixed_rows = run_fixed_scenarios(repeats=repeats)
-    random_rows, random_summary = run_random_scenarios(n=n_random, seed=seed)
-    return fixed_rows, random_rows, random_summary
+def run_all(repeats=TIME_REPEATS):
+    """Chay TN1 va TN2, tra ve du lieu cho notebook."""
+    return run_fixed_scenarios(repeats=repeats)
 
 
 if __name__ == "__main__":
     print("Dang chay TN1-TN2 (do thoi gian trung binh qua", TIME_REPEATS, "lan)...")
-    fixed = run_fixed_scenarios(repeats=TIME_REPEATS)
+    run_fixed_scenarios(repeats=TIME_REPEATS)
     print("Da luu:", OUTPUT_DIR / "fixed_scenarios_results.csv")
-    print("Dang chay TN3 voi", RANDOM_DATASETS, "bo du lieu ngau nhien...")
-    random_rows, summary = run_random_scenarios(n=RANDOM_DATASETS, seed=RANDOM_SEED)
-    print("Da luu:", OUTPUT_DIR / "TN3_random_300_results.csv")
-    print("Thong ke TN3:", summary)
-    print("Luu y: neu astar_differs_from_brute > 0, can kiem tra lai A* va heuristic.")

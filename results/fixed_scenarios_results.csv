@@ -1,7 +1,7 @@
 ﻿algorithm,path,num_visited,finish_time,finish_clock,states,scenario,start_time,deadline,runtime_seconds_avg,runtime_repeats,path_names
-Greedy,"[3, 1, 5, 6, 2, 4]",6,960,16:00,140,TN1,08:00,16:00,6.292297970503569e-05,100,St. Joseph's Cathedral -> Dong Xuan Market -> Imperial Citadel of Thang Long -> Ho Chi Minh Mausoleum -> Tran Quoc Pagoda -> Temple of Literature
-A*,"[3, 1, 4, 6, 2, 7]",6,896,14:56,3845,TN1,08:00,16:00,1.4052064919797704,100,St. Joseph's Cathedral -> Dong Xuan Market -> Temple of Literature -> Ho Chi Minh Mausoleum -> Tran Quoc Pagoda -> Tay Ho Temple
-Vet can,"[3, 1, 4, 6, 2, 7]",6,896,14:56,5040,TN1,08:00,16:00,0.011676576966419817,100,St. Joseph's Cathedral -> Dong Xuan Market -> Temple of Literature -> Ho Chi Minh Mausoleum -> Tran Quoc Pagoda -> Tay Ho Temple
-Greedy,"[3, 1, 2, 4, 7]",5,826,13:46,126,TN2,08:00,14:00,6.36640191078186e-05,100,St. Joseph's Cathedral -> Dong Xuan Market -> Tran Quoc Pagoda -> Temple of Literature -> Tay Ho Temple
-A*,"[3, 1, 2, 4, 7]",5,826,13:46,103,TN2,08:00,14:00,0.004694576999172568,100,St. Joseph's Cathedral -> Dong Xuan Market -> Tran Quoc Pagoda -> Temple of Literature -> Tay Ho Temple
-Vet can,"[3, 1, 2, 4, 7]",5,826,13:46,5040,TN2,08:00,14:00,0.007445975011214614,100,St. Joseph's Cathedral -> Dong Xuan Market -> Tran Quoc Pagoda -> Temple of Literature -> Tay Ho Temple
+Greedy,"[3, 1, 5, 6, 2, 4]",6,960,16:00,140,TN1,08:00,16:00,9.971697349101305e-05,100,St. Joseph's Cathedral -> Dong Xuan Market -> Imperial Citadel of Thang Long -> Ho Chi Minh Mausoleum -> Tran Quoc Pagoda -> Temple of Literature
+A*,"[3, 1, 4, 6, 2, 7]",6,896,14:56,3845,TN1,08:00,16:00,0.89912839199882,100,St. Joseph's Cathedral -> Dong Xuan Market -> Temple of Literature -> Ho Chi Minh Mausoleum -> Tran Quoc Pagoda -> Tay Ho Temple
+Vet can,"[3, 1, 4, 6, 2, 7]",6,896,14:56,5040,TN1,08:00,16:00,0.016167213004082442,100,St. Joseph's Cathedral -> Dong Xuan Market -> Temple of Literature -> Ho Chi Minh Mausoleum -> Tran Quoc Pagoda -> Tay Ho Temple
+Greedy,"[3, 1, 2, 4, 7]",5,826,13:46,126,TN2,08:00,14:00,5.985799245536327e-05,100,St. Joseph's Cathedral -> Dong Xuan Market -> Tran Quoc Pagoda -> Temple of Literature -> Tay Ho Temple
+A*,"[3, 1, 2, 4, 7]",5,826,13:46,103,TN2,08:00,14:00,0.004366939952597022,100,St. Joseph's Cathedral -> Dong Xuan Market -> Tran Quoc Pagoda -> Temple of Literature -> Tay Ho Temple
+Vet can,"[3, 1, 2, 4, 7]",5,826,13:46,5040,TN2,08:00,14:00,0.009387480993755162,100,St. Joseph's Cathedral -> Dong Xuan Market -> Tran Quoc Pagoda -> Temple of Literature -> Tay Ho Temple
